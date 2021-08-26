@@ -68,11 +68,10 @@ def AreaCenterMax_vs_Voltage():
     centers['Spec_Time'] = Spec_Time
     maxima['Spec_Time'] = Spec_Time
     # Set all time columns in terms of hours. It is assumed that an FTIR spectrum
-    # is taken every 10 minutes and is started at t = 0. EChem data is assumed
-    # be reported in minutes.
-    areas['Spec_Time'] = ((areas['Spec_Time']*10) - 10)/60
-    centers['Spec_Time'] = ((centers['Spec_Time']*10) - 10)/60
-    maxima['Spec_Time'] = ((maxima['Spec_Time']*10) - 10)/60
+    # is started at t = 0. EChem data is assumed to be reported in seconds.
+    areas['Spec_Time'] = ((areas['Spec_Time']*args['spectrum_interval']) - args['spectrum_interval'])/60
+    centers['Spec_Time'] = ((centers['Spec_Time']*args['spectrum_interval']) - args['spectrum_interval'])/60
+    maxima['Spec_Time'] = ((maxima['Spec_Time']*args['spectrum_interval']) - args['spectrum_interval'])/60
     EChem_data['TestTime'] = EChem_data['TestTime']/3600
     # create a key to get data from df's 
     key = 'Component_'+str(args['component_to_plot'])

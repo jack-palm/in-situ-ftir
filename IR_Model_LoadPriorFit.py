@@ -18,7 +18,7 @@ args= {# String of absolute path
 
 """
 A simple script to load prior fitting results. Input the folder and the script
-returns the amplitudes, areas, centers, curves, insitu_data, maxima, sigmas and raw insitu_data.
+returns the amplitudes, areas, centers, curves, maxima, sigmas and raw insitu_data.
 
 """
 

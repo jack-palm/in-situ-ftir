@@ -13,13 +13,13 @@ args = {
     'EChem_file' : 'C:/Users/someuser/folder_with_echem_data/echem_data.txt',
     'Fit_folder' : 'C:/Users/someuser/folder_with_fit_data',  
     # Enter a single integer corresponding to the component you would like to plot
-    'components_to_plot' : [500, 510, 540, 560, 580, 590, 620] # 500, 510, 540, 620, 560, 580, 590
+    'components_to_plot' : [500, 510, 540, 560, 580, 590, 620], # 500, 510, 540, 620, 560, 580, 590
+    'spectrum_interval' : 10 # interval in minutes at which FTIR spectra were taken
 }
 
 ##############################################################################
 ##############################################################################
 ##############################################################################
-
 
 def AreaCenterMax_with_Voltage():
     
@@ -69,11 +69,10 @@ def AreaCenterMax_with_Voltage():
     centers['Spec_Time'] = Spec_Time
     maxima['Spec_Time'] = Spec_Time
     # Set all time columns in terms of hours. It is assumed that an FTIR spectrum
-    # is taken every 10 minutes and is started at t = 0. EChem data is assumed
-    # be reported in minutes.
-    areas['Spec_Time'] = ((areas['Spec_Time']*10) - 10)/60
-    centers['Spec_Time'] = ((centers['Spec_Time']*10) - 10)/60
-    maxima['Spec_Time'] = ((maxima['Spec_Time']*10) - 10)/60
+    # is started at t = 0. EChem data is assumed to be reported in seconds.
+    areas['Spec_Time'] = ((areas['Spec_Time']*args['spectrum_interval']) - args['spectrum_interval'])/60
+    centers['Spec_Time'] = ((centers['Spec_Time']*args['spectrum_interval']) - args['spectrum_interval'])/60
+    maxima['Spec_Time'] = ((maxima['Spec_Time']*args['spectrum_interval']) - args['spectrum_interval'])/60
     EChem_data['TestTime'] = EChem_data['TestTime']/3600
     # store component names to keys
     keys = []

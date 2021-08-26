@@ -43,6 +43,6 @@ def RawMultiPlot(filepath, start, step, amount):
     
 # iterate over the desired number of plots and call the function.
 for i in range(11):    
-    RawMultiPlot('C:/Users/someuser/folder_with_data/datafile.txt', (i*10), 1, 10)
+    RawMultiPlot('C:/Users/someuser/folder_with_data/insitu_dataset.csv', (i*10), 1, 10)
 
 

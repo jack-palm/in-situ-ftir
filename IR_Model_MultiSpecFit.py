@@ -19,42 +19,46 @@ from scipy.signal import savgol_filter as sgf
 # Define your intial parameters here.  
 initial_vals = {'folder':'C:/Users/someuser/folder_with_data',
                 'export_folder' : 'C:/Users/someuser/temp',
-                'start' : 140, # Which run do you want to start the fit? 1 is the first. this parameter matters when fitting a select number of spectra
-                'step' : 1, # At what interval should spectra be selected? 1 is recommended because of peak shifting
+                'start' : 140, # Which run do you want to start the fit? 1 is the first. 
+                               # This parameter matters when fitting a select number of spectra
+                'step' : 1, # At what interval should spectra be selected? 
+                            # 1 is recommended because of peak shifting
                 'amount' : 100, # How many total spectra do you want to fit? 
                 # 'all' or 'All' will fit all starting at the first spectrum, 
                 # while entering an integer will fit that many spectra 
                 # starting at the specified spectrum 
                 'lower_bound' : 462, # Lowest wavenumber of fitting domain
                 'upper_bound' : 630, # Highest wavenumber of fitting domain
-                'LNO_peaks' : [503,567,580,591], # Wavenumbers of components
-                'LiClO4_PC_peaks' : [515,544,623], # Wavenumbers of components
-                'Fixed_Peaks' : [503,515,544,623], # Peaks not allowed to move during the fit
-                'Mobile_Peaks' : [567,580,591],# Peaks allowed to move during the fit
+                'Fixed_Peaks' : [500,510,540,620], # Peaks not allowed to move during the fit
+                'Mobile_Peaks' : [560,580,590],# Peaks allowed to move during the fit
                 'tolerance' : 5.0, # Amount allowed to deviate from peaks defined above 
-                'first_vals' : pd.DataFrame(np.array([[0.2,503,15], 
-                                                    [1,515,19.7],
-                                                    [0.9,544,12.5], 
-                                                    [0.6,567,9],
-                                                    [0.5,580,7],
-                                                    [0.15,591,4],
-                                                    [1.3,623,4]]),
+                'min_amplitude' : 0.1, # Define minimum amplitude. Get this value from SingleSpecFit
+                'max_amplitude' : 3, # Define maximum amplitude. Get this value from SingleSpecFit
+                'min_sigma' : 1, # Define minimum sigma. Get this value from SingleSpecFit
+                'max_sigma' : 20, # Define maximum sigma. Get this value from SingleSpecFit
+                'first_vals' : pd.DataFrame(np.array([[1,500,10], 
+                                                    [1,510,10],
+                                                    [1,540,10], 
+                                                    [1,560,1],
+                                                    [1,580,1],
+                                                    [1,590,1],
+                                                    [1,620,1]]),
                                            columns=['amplitude', 'center', 'sigma'])
                 # 'first_vals' is the model's first guess at parameters 
 }
 
+##############################################################################
+##############################################################################
+##############################################################################
+
 # Add 'x_peaks' to initial_vals: all peaks added to one list. Sort it.
-initial_vals['x_peaks'] = initial_vals['LNO_peaks']+initial_vals['LiClO4_PC_peaks']
+initial_vals['x_peaks'] = initial_vals['Mobile_Peaks']+initial_vals['Fixed_Peaks']
 initial_vals['x_peaks'].sort()
 # change the index of the df to the initial centers
 initial_vals['first_vals']['centers'] = initial_vals['first_vals']['center']
 initial_vals['first_vals'] = initial_vals['first_vals'].set_index('centers')
 # store the name of the run for plotting purposes
 run_name = 'Run_' + str(initial_vals['start'])
-
-##############################################################################
-##############################################################################
-##############################################################################
 
 def initial_fit(initial_vals):    
     
@@ -123,8 +127,12 @@ def initial_fit(initial_vals):
             x2_ind = rounded_x.index(upper_bound - 1)
         
         # slice the desired data down to the specified range and store
-        x_fit = x_vals[x1_ind:x2_ind]
-        y_fit = y_vals[x1_ind:x2_ind]
+        if x2_ind > x1_ind:
+            x_fit = x_vals[x1_ind:x2_ind]
+            y_fit = y_vals[x1_ind:x2_ind]
+        else:
+            x_fit = x_vals[x2_ind:x1_ind]
+            y_fit = y_vals[x2_ind:x1_ind]
         return x_fit, y_fit
 
     """
@@ -154,8 +162,8 @@ def initial_fit(initial_vals):
         # This peak will not move
         pars[prefix+'center'].set(vary = False) 
         # All amplitudes must be positive
-        pars[prefix+'amplitude'].set(min=0.1, max = 3)
-        pars[prefix+'sigma'].set(min=1,max=20)
+        pars[prefix+'amplitude'].set(min=initial_vals['min_amplitude'], max = initial_vals['max_amplitude'])
+        pars[prefix+'sigma'].set(min=initial_vals['min_sigma'],max=initial_vals['max_sigma'])
         # Add the component and its name to the respective dict and list
         components[prefix] = peak
         component_names.append(prefix)
@@ -177,8 +185,8 @@ def initial_fit(initial_vals):
                 peak = GaussianModel(prefix=prefix)
                 pars.update(peak.make_params(center=center, sigma=sigma, amplitude=A))
                 pars[prefix+'center'].set(vary = False) 
-                pars[prefix+'amplitude'].set(min=0.1,max = 3)
-                pars[prefix+'sigma'].set(min=1,max=20)
+                pars[prefix+'amplitude'].set(min=initial_vals['min_amplitude'], max = initial_vals['max_amplitude'])
+                pars[prefix+'sigma'].set(min=initial_vals['min_sigma'],max=initial_vals['max_sigma'])
                 components[prefix] = peak
                 component_names.append(prefix)
                 mod += components[component_names[i]]
@@ -197,8 +205,8 @@ def initial_fit(initial_vals):
                 pars.update(peak.make_params(center=center, sigma=sigma, amplitude=A))
                 pars[prefix+'center'].set(min=center-initial_vals['tolerance'],
                                           max=center+initial_vals['tolerance']) 
-                pars[prefix+'amplitude'].set(min=0.1,max=3)
-                pars[prefix+'sigma'].set(min=1,max=20)
+                pars[prefix+'amplitude'].set(min=initial_vals['min_amplitude'], max = initial_vals['max_amplitude'])
+                pars[prefix+'sigma'].set(min=initial_vals['min_sigma'],max=initial_vals['max_sigma'])
                 components[prefix] = peak
                 component_names.append(prefix)
                 mod += components[component_names[i+len(initial_vals['Fixed_Peaks'])]]
@@ -421,8 +429,8 @@ def fit_all(insitu_data, best_vals, curves, amplitudes, areas, initial_vals):
         pars[prefix+'center'].set(min=center-0.5,
                                   max=center+0.5) 
         # All amplitudes must be positive
-        pars[prefix+'amplitude'].set(min=0.1,max=3)
-        pars[prefix+'sigma'].set(min=1,max=20)
+        pars[prefix+'amplitude'].set(min=initial_vals['min_amplitude'], max = initial_vals['max_amplitude'])
+        pars[prefix+'sigma'].set(min=initial_vals['min_sigma'],max=initial_vals['max_sigma'])
         # Add the component and its name to the respective dict and list
         components[prefix] = peak
         component_names.append(prefix)
@@ -445,8 +453,8 @@ def fit_all(insitu_data, best_vals, curves, amplitudes, areas, initial_vals):
                 pars.update(peak.make_params(center=center, sigma=sigma, amplitude=A))
                 pars[prefix+'center'].set(min=center-0.5,
                                           max=center+0.5) 
-                pars[prefix+'amplitude'].set(min=0.1,max=3)
-                pars[prefix+'sigma'].set(min=1,max=20)
+                pars[prefix+'amplitude'].set(min=initial_vals['min_amplitude'], max = initial_vals['max_amplitude'])
+                pars[prefix+'sigma'].set(min=initial_vals['min_sigma'],max=initial_vals['max_sigma'])
                 components[prefix] = peak
                 component_names.append(prefix)
                 mod += components[component_names[i]]
@@ -465,7 +473,7 @@ def fit_all(insitu_data, best_vals, curves, amplitudes, areas, initial_vals):
                 pars.update(peak.make_params(center=center, sigma=sigma, amplitude=A))
                 pars[prefix+'center'].set(min=center-initial_vals['tolerance'],
                                           max=center+initial_vals['tolerance']) 
-                pars[prefix+'amplitude'].set(min=0.1,max=3)
+                pars[prefix+'amplitude'].set(min=initial_vals['min_amplitude'], max = initial_vals['max_amplitude'])
                 pars[prefix+'sigma'].set(min=sigma-0.5,max=sigma+0.5)
                 components[prefix] = peak
                 component_names.append(prefix)
