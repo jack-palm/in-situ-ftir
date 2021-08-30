@@ -44,3 +44,9 @@ This scipt is the similar to above, except voltage is plotted on the abscissa. T
 ## IR_Model_LoadPriorFit
 A simple script to load prior fitting results as local variables. Not that useful.
 
+## IR_Model_ErrorPlot
+A script that plots the error of the fit versus run number. There are MSE, RMSE, and RMSE normaized by the interquartile range (nRMSE) of the raw data used for the fitting, allowing for apples-to-apples comparison among fits. The nRMSE is preferred as it can be thought of as similar to percent error.
+
+![errorplot_demo](https://user-images.githubusercontent.com/87740914/131384484-d9e8342b-bc97-4762-998a-e8eecd1f004f.png)
+
+This plot shows the fit going from very bad to not-quite-so-bad-but-still-not-good
