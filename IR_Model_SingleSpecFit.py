@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt  
 import matplotlib.pylab as pl
 from lmfit.models import GaussianModel
+from scipy import stats
 
 ##############################################################################
 ################################ USER INPUTS #################################
@@ -202,8 +203,25 @@ def single_fit():
                 # add the component to the best fit dataframe 
                 curves['Best_Fit']['Abs'] = curves['Best_Fit']['Abs'].add(curves[component_names[i]]['Abs'], fill_value = 0)
             return curves
+        
+        # Define a function to calculate MSE, RMSE and nRMSE (normalized by the 
+        # interquartile range)
+        def MSE_RMSE(y_fit, curves):
+            
+            y_true = list(y_fit)
+            y_pred = list(curves['Best_Fit']['Abs'])
+            MSE = np.square(np.subtract(y_true,y_pred)).mean()
+            RMSE = np.sqrt(MSE)
+            IQR = stats.iqr(y_true, interpolation = 'midpoint')
+            nRMSE = RMSE/IQR
+            
+            return [['MSE', 'RMSE', 'nRMSE'],[MSE, RMSE, nRMSE]]
+        
         # call generateY to produce the dict. "curves"
         curves = generateY(x_fit, best_vals)
+        # Call MSE_RMSE to generate fit scores
+        errors = MSE_RMSE(y_fit, curves)
+        
         # initiate a figure to plot all the components onto
         plt.figure(figsize=(4.5,4)) 
         plt.figure(dpi = 200)
@@ -255,7 +273,7 @@ def single_fit():
         areas[0] = temp_areas
         maxima[0] = temp_maxima
             
-        return curves, amplitudes, centers, areas, sigmas, maxima
+        return curves, amplitudes, centers, areas, sigmas, maxima, errors
     
     # call the functions defined above and store their outputs
     # extract the desired region from the specifed spectrum within insitu_data
@@ -265,6 +283,6 @@ def single_fit():
     # plot the fitting result and return the curves, areas, and amplitudes
     curves, amplitudes, centers, areas, sigmas, maxima = plot_components(x_fit, y_fit, best_vals, initial_vals['x_peaks'], component_names)
     
-    return best_vals, curves, amplitudes, centers, areas, sigmas, maxima
+    return best_vals, curves, amplitudes, centers, areas, sigmas, maxima, errors
    
-best_vals, curves, amplitudes, centers, areas, sigmas, maxima = single_fit()
+best_vals, curves, amplitudes, centers, areas, sigmas, maxima, errors = single_fit()

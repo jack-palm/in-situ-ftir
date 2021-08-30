@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import matplotlib.pylab as pl
 from lmfit.models import GaussianModel
 from scipy.signal import savgol_filter as sgf
+from scipy import stats
 
 ##############################################################################
 ################################ USER INPUTS #################################
@@ -283,9 +284,25 @@ def initial_fit(initial_vals):
                 # add the component to the best fit dataframe 
                 curves['Best_Fit']['Abs'] = curves['Best_Fit']['Abs'].add(curves[component_names[i]]['Abs'], fill_value = 0)
             return curves
-        
+       
+        # Define a function to calculate MSE, RMSE and nRMSE (normalized by the 
+        # interquartile range)
+        def MSE_RMSE(y_fit, curves):
+            
+            y_true = list(y_fit)
+            y_pred = list(curves['Best_Fit']['Abs'])
+            MSE = np.square(np.subtract(y_true,y_pred)).mean()
+            RMSE = np.sqrt(MSE)
+            IQR = stats.iqr(y_true, interpolation = 'midpoint')
+            nRMSE = RMSE/IQR
+            
+            return [['MSE', 'RMSE', 'nRMSE'],[MSE, RMSE, nRMSE]]
+             
         # call generateY to produce the dict. "curves"
         curves = generateY(x_fit, best_vals)
+        # Call MSE_RMSE to generate fit scores
+        errors = MSE_RMSE(y_fit, curves)
+        
         # initiate a figure to plot all the components onto
         plt.figure(figsize=(4.5,4)) 
         plt.figure(dpi = 200)
@@ -342,7 +359,7 @@ def initial_fit(initial_vals):
         areas[run_name] = temp_areas
         maxima[run_name] = temp_maxima
             
-        return curves, amplitudes, centers, areas, sigmas, maxima
+        return curves, amplitudes, centers, areas, sigmas, maxima, errors
     
     # call the functions defined above and store their outputs
     # load the insitu dataset and store it
@@ -352,9 +369,9 @@ def initial_fit(initial_vals):
     # fit the desired data and return the best fit parameter values
     best_vals, component_names = get_fit_parameters(x_fit, y_fit, initial_vals['x_peaks'], initial_vals['first_vals'])
     # plot the fitting result and return the curves, areas, and amplitudes
-    curves, amplitudes, centers, areas, sigmas, maxima = plot_components(x_fit, y_fit, best_vals, initial_vals['x_peaks'], component_names)
+    curves, amplitudes, centers, areas, sigmas, maxima, errors = plot_components(x_fit, y_fit, best_vals, initial_vals['x_peaks'], component_names)
     
-    return insitu_data, best_vals, curves, amplitudes, centers, areas, sigmas, maxima, run_name
+    return insitu_data, best_vals, curves, amplitudes, centers, areas, sigmas, maxima, run_name, errors
    
 """
 The function "fit_all" iterates through the desired range of insitu runs and performs 
@@ -366,7 +383,7 @@ xy-coordinates of the best-fit line and each component (dict. of df's)
                                                         
 """
 
-def fit_all(insitu_data, best_vals, curves, amplitudes, areas, initial_vals):
+def fit_all(insitu_data, best_vals, curves, amplitudes, areas, initial_vals, errors):
     
     """
     This function "load_insitu_dataset" reads each file in the specified folder
@@ -551,8 +568,25 @@ def fit_all(insitu_data, best_vals, curves, amplitudes, areas, initial_vals):
                 # add the component to the best fit dataframe 
                 curves['Best_Fit']['Abs'] = curves['Best_Fit']['Abs'].add(curves[component_names[i]]['Abs'], fill_value = 0)
             return curves
+        
+        # Define a function to calculate MSE, RMSE and nRMSE (normalized by the 
+        # interquartile range)
+        def MSE_RMSE(y_fit, curves):
+            
+            y_true = list(y_fit)
+            y_pred = list(curves['Best_Fit']['Abs'])
+            MSE = np.square(np.subtract(y_true,y_pred)).mean()
+            RMSE = np.sqrt(MSE)
+            IQR = stats.iqr(y_true, interpolation = 'midpoint')
+            nRMSE = RMSE/IQR
+            
+            return [['MSE', 'RMSE', 'nRMSE'],[MSE, RMSE, nRMSE]]
+        
         # call generateY to produce the dict. "curves"
         curves = generateY(x_fit, best_vals)
+        # Call MSE_RMSE to generate fit scores
+        errors = MSE_RMSE(y_fit, curves)
+        
         # initiate a figure to plot all the components onto
         plt.figure(figsize=(4.5,4)) 
         plt.figure(dpi = 200)
@@ -603,7 +637,7 @@ def fit_all(insitu_data, best_vals, curves, amplitudes, areas, initial_vals):
                                  x = curves[name]['Wavenumber']))
             best_maxima.append(max(curves[name]['Abs']))
             
-        return curves, best_amps, best_centers, best_areas, best_sigmas, best_maxima
+        return curves, best_amps, best_centers, best_areas, best_sigmas, best_maxima, errors
     # iterate over the desired range of the insitu dataset
     # if all spectra are desired to be fit, this will execute
     if initial_vals['amount'] == 'all' or initial_vals['amount'] == 'All':
@@ -613,7 +647,7 @@ def fit_all(insitu_data, best_vals, curves, amplitudes, areas, initial_vals):
                                            initial_vals['lower_bound'], 
                                            initial_vals['upper_bound'])
             best_vals, component_names = get_fit_parameters(x_fit, y_fit, initial_vals['x_peaks'], best_vals)
-            curves['Run_'+str(i+2)], amplitudes['Run_'+str(i+2)], centers['Run_'+str(i+2)], areas['Run_'+str(i+2)], sigmas['Run_'+str(i+2)], maxima['Run_'+str(i+2)] = plot_components(x_fit, y_fit, best_vals, initial_vals['x_peaks'], component_names, i+2)
+            curves['Run_'+str(i+2)], amplitudes['Run_'+str(i+2)], centers['Run_'+str(i+2)], areas['Run_'+str(i+2)], sigmas['Run_'+str(i+2)], maxima['Run_'+str(i+2)], errors['Run_'+str(i+2)] = plot_components(x_fit, y_fit, best_vals, initial_vals['x_peaks'], component_names, i+2)
     # if a select range specified in the initial_vals dict is desired, this
     # will execute
     else:
@@ -623,9 +657,9 @@ def fit_all(insitu_data, best_vals, curves, amplitudes, areas, initial_vals):
                                            initial_vals['lower_bound'], 
                                            initial_vals['upper_bound'])
             best_vals, component_names = get_fit_parameters(x_fit, y_fit, initial_vals['x_peaks'], best_vals)
-            curves['Run_'+str(initial_vals['start']+(i*initial_vals['step'])+1)], amplitudes['Run_'+str(initial_vals['start']+(i*initial_vals['step'])+1)], centers['Run_'+str(initial_vals['start']+(i*initial_vals['step'])+1)], areas['Run_'+str(initial_vals['start']+(i*initial_vals['step'])+1)], sigmas['Run_'+str(initial_vals['start']+(i*initial_vals['step'])+1)], maxima['Run_'+str(initial_vals['start']+(i*initial_vals['step'])+1)] = plot_components(x_fit, y_fit, best_vals, initial_vals['x_peaks'], component_names, initial_vals['start']+(i*initial_vals['step'])+1)
+            curves['Run_'+str(initial_vals['start']+(i*initial_vals['step'])+1)], amplitudes['Run_'+str(initial_vals['start']+(i*initial_vals['step'])+1)], centers['Run_'+str(initial_vals['start']+(i*initial_vals['step'])+1)], areas['Run_'+str(initial_vals['start']+(i*initial_vals['step'])+1)], sigmas['Run_'+str(initial_vals['start']+(i*initial_vals['step'])+1)], maxima['Run_'+str(initial_vals['start']+(i*initial_vals['step'])+1)], errors['Run_'+str(initial_vals['start']+(i*initial_vals['step'])+1)] = plot_components(x_fit, y_fit, best_vals, initial_vals['x_peaks'], component_names, initial_vals['start']+(i*initial_vals['step'])+1)
             
-    return curves, areas, centers, amplitudes, sigmas
+    return curves, areas, centers, amplitudes, sigmas, errors
 
 """
 "data_export" takes a user defined directory, creates a new folder within that
@@ -658,6 +692,7 @@ def data_export(folder, export): # 'folder' is the desired path for export
         insitu_data.to_csv(path+'/insitu_dataset.csv', index = None)
         # save curves dict to a .npy file for easy loading later
         np.save(path + '/curves_dict.npy', curves)
+        np.save(path + '/errors_dict.npy', errors)
 
         # create a folder to save the curves under the new directory
         curve_path = path + '/curves'
@@ -677,15 +712,25 @@ def data_export(folder, export): # 'folder' is the desired path for export
                 temp[key2] = curves[key][key2]['Abs']
             # once all components are added, save the df to the curves directory
             temp.to_csv(curve_path + '/'+key+'.csv', index = None)
-            
-# Initiate a dict to store curves
+        # populate a df with the errors data and save to .csv
+        errors_df = pd.DataFrame(columns = list(errors.keys()))
+        errors_df['error_type'] = errors[list(errors.keys())[0]][0]
+        for k in list(errors.keys()):
+            for i in range(3):
+                errors_df.loc[i,k] = errors[k][1][i]
+        
+        errors_df.to_csv(path + '/errors.csv', index = None)
+        
+# Initiate a dict to store curves and errors
 # Run the initial fit         
 curves = {} 
-insitu_data, best_vals, temp, amplitudes, centers, areas, sigmas, maxima, run_name = initial_fit(initial_vals)
-curves[run_name] = temp
+errors = {}
+insitu_data, best_vals, temp_curves, amplitudes, centers, areas, sigmas, maxima, run_name, temp_errors = initial_fit(initial_vals)
+curves[run_name] = temp_curves
+errors[run_name] = temp_errors
     
 # call the iterative fitting function
-fit_all(insitu_data, best_vals, curves, amplitudes, areas, initial_vals)
+fit_all(insitu_data, best_vals, curves, amplitudes, areas, initial_vals, errors)
             
 # call the function. Unless the second arg is 'True', this function will not execute
 data_export(initial_vals['export_folder'], True)

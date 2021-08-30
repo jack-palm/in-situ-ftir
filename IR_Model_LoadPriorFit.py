@@ -18,7 +18,7 @@ args= {# String of absolute path
 
 """
 A simple script to load prior fitting results. Input the folder and the script
-returns the amplitudes, areas, centers, curves, maxima, sigmas and raw insitu_data.
+returns the amplitudes, areas, centers, curves, maxima, sigmas, errors and raw insitu_data.
 
 """
 
@@ -35,10 +35,11 @@ def LoadPriorFit(folder):
     insitu_data = pd.read_csv(folder + '/insitu_dataset.csv')
     # read in the curves dictionary
     curves = np.load(folder + '/curves_dict.npy',allow_pickle='TRUE').item()
+    errors = np.load(folder + '/errors_dict.npy',allow_pickle='TRUE').item()
 
-    return amplitudes, areas, centers, curves, insitu_data, maxima, sigmas
+    return amplitudes, areas, centers, curves, insitu_data, maxima, sigmas, errors
 
 # call the funciton
-amplitudes, areas, centers, curves, insitu_data, maxima, sigmas = LoadPriorFit(args['folder_path'])
+amplitudes, areas, centers, curves, insitu_data, maxima, sigmas, errors = LoadPriorFit(args['folder_path'])
 
 
