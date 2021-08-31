@@ -12,14 +12,15 @@ import matplotlib.pylab as pl
 from lmfit.models import GaussianModel
 from scipy.signal import savgol_filter as sgf
 from scipy import stats
+from natsort import natsorted
 
 ##############################################################################
 ################################ USER INPUTS #################################
 ##############################################################################
 
 # Define your intial parameters here.  
-initial_vals = {'folder':'C:/Users/someuser/folder_with_data',
-                'export_folder' : 'C:/Users/someuser/temp',
+initial_vals = {'folder':'C:/demo/test/LNO_Gen2_Data',
+                'export_folder' : 'C:/demo/test',
                 'start' : 140, # Which run do you want to start the fit? 1 is the first. 
                                # This parameter matters when fitting a select number of spectra
                 'step' : 1, # At what interval should spectra be selected? 
@@ -71,29 +72,16 @@ def initial_fit(initial_vals):
         
         #store a list of file names in the folder to files
         files = os.listdir(folder)
-        
-        #create a list handles and populate with the counter in each file name
-        #this will be used to load the files in chronological order
-        handles = []
-        for name in files:
-            handles.append(int(name.split('_')[-3]))
-            
-        #create a dataframe of filenames and handles to sort the file names
-        data = {'Files':files, 
-                'Indices':handles} 
-        df = pd.DataFrame(data)
-        df = df.sort_values(by = ['Indices'])
-        df = df.reset_index()
-        df = df[['Files','Indices']]
+        files = natsorted(files)
         
         #initiate insitu_data. Add filenames as column  add x coordinates (wavenumber)
-        insitu_data = pd.DataFrame(columns = list(df.loc[:,'Files']))
-        temp_data = pd.read_csv(folder + '/' + df.loc[0,'Files'], header= None)
+        insitu_data = pd.DataFrame(columns = files)
+        temp_data = pd.read_csv(folder + '/' + files[0], header= None)
         insitu_data['Wavenumber'] = temp_data[0]
         
         #populate insitu_data with all data 
         for i in range(len(files)):
-            temp_data = pd.read_csv(folder + '/' + df.loc[i,'Files'], header= None)
+            temp_data = pd.read_csv(folder + '/' + files[i], header= None)
             # smooth the data with a light Savitsky-Golay filter
             insitu_data.iloc[:,i] = sgf(temp_data.iloc[:,1], 17, 5)
         
@@ -117,16 +105,16 @@ def initial_fit(initial_vals):
         # since wavenumber does not increase by exactly 1, we need to map the 
         # desired bound to a rounded x-value and extract the index. If that 
         # value does not exist, the next closest value is taken.
-        if lower_bound in rounded_x == True:
-            x1_ind = rounded_x.index(lower_bound)
-        else:
-            x1_ind = rounded_x.index(lower_bound + 1)
-          
-        if upper_bound in rounded_x == True:
-            x2_ind = rounded_x.index(upper_bound)
-        else:
-            x2_ind = rounded_x.index(upper_bound - 1)
-        
+        # Find the index of the lower bound. Once it is found, break
+        for i in range(4):
+            if (lower_bound + i in rounded_x) == True:
+                x1_ind = rounded_x.index(lower_bound + i)
+                break
+        # Find the index of the upper bound. Once it is found, break
+        for i in range(4):
+            if (upper_bound - i in rounded_x) == True:
+                x2_ind = rounded_x.index(upper_bound - i)
+                break                        
         # slice the desired data down to the specified range and store
         if x2_ind > x1_ind:
             x_fit = x_vals[x1_ind:x2_ind]
