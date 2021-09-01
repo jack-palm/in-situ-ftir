@@ -11,6 +11,12 @@ This script is for the fitting of gaussians to a single FTIR spectrum. It assume
 ![singlespec_demo](https://user-images.githubusercontent.com/87740914/131015326-4e6e1f23-dd37-4ad4-9b34-ba37859c291c.png)
 not the greatest fit, but you get the idea.
 
+## IR_Model_BaselineTest
+This script uses a convex hull fitting algorithm to baseline a single spectrum and plots the baselined spectrum on the same plot as the raw data. The entire spectrum or a specific region of the spectrum can treated. This is useful to get an idea of how the fitting algorithm affects your data before batch processing the entire dataset. This script also allows the user to input another filepath for use as a reference (i.e. a known baselined spectrum). All spectra are normalized to 0<y<1. 
+
+## IR_Model_BaselineCorrect
+This script takes a folder with your data in it, baselines every spectrum in that folder and saves that data to a new folder in the same parent folder. For example, if the path to the folder with your data in it is 'C:/user/folder' the script will create a new folder 'C:/user/folder_BLSub' and save the baselined spectra there. You can baseline the entire spectrum or specify a region.
+
 ## IR_Model_MultiSpecFit
 This script is the workhorse of this repository. Feed it a folder containing all of your in situ data files, fill out the user inputs, and let it run. As the script iterates through the desired portion of the dataset, it will output a plot like the one above and at the end of the fitting, it will store the results of the fit to the user-specified folder. The annotated inputs are pictured below.
 
