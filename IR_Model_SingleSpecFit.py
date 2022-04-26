@@ -2,6 +2,8 @@
 """
 author: Jack Palmer
 email: jpalmer1028@gmail.com
+new updates by: Lydia Meyer
+email: lydiaemeyer@gmail.com
 """
 
 import pandas as pd
