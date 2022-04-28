@@ -19,8 +19,8 @@ from natsort import natsorted
 ##############################################################################
 
 # Define your intial parameters here.  
-initial_vals = {'folder':'C:/demo/test/LNO_Gen2_Data',
-                'export_folder' : 'C:/demo/test',
+initial_vals = {'folder':'C:\\Users\LMEYER\Documents\Practice FTIR code\LNO_1MLiClO4inPC_Data_BLSub\LNO_1MLiClO4inPC_Data_BLSub_BLSub',
+                'export_folder' : 'C:\\Users\LMEYER\Documents\Practice FTIR code',
                 'start' : 140, # Which run do you want to start the fit? 1 is the first. 
                                # This parameter matters when fitting a select number of spectra
                 'step' : 1, # At what interval should spectra be selected? 
