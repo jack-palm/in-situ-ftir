@@ -42,7 +42,12 @@ def RawMultiPlot(filepath, start, step, amount):
     plt.legend(fontsize = 7)
     
 # iterate over the desired number of plots and call the function.
-for i in range(11):    
-    RawMultiPlot('C:/Users/someuser/folder_with_data/insitu_dataset.csv', (i*10), 1, 10)
+for i in range(5):    
+    RawMultiPlot('C:\\Users\LMEYER\Desktop/test_spec.csv', (i*2), 1, 3)
 
-
+#Data must be in columns of absorbance so
+#Wavenumber Absorbance 1 Absorbance 2 Absorbance 3
+#Range is the number of plots
+#(i*x) x is is the step size between the first spectra listed shown in the plots
+# second number is the starting spectrum
+#third number is the amount of spectra per plot
