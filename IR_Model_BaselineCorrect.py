@@ -2,6 +2,8 @@
 """
 author: Jack Palmer
 email: jpalmer1028@gmail.com
+updates by: Lydia Meyer
+email: lydiaemeyer@gmail.com
 """
 
 import pandas as pd
@@ -16,7 +18,7 @@ import os
 
 args = {
     # Path to raw data
-    'folder' : 'C:/demo/test/',
+    'folder' : 'C:\\Users\LMEYER\Documents\Practice FTIR code\LNO_1MLiClO4inPC_Data_BLSub\LNO_1MLiClO4inPC_Data_BLSub',
     # 'all' or 'All' will baseline the entire spectrum
     # a list of two values low to high will baseline over that range
     'region' : 'all'
