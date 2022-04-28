@@ -12,7 +12,7 @@ args = {
     # Title for the map
     'Plot_Title' : 'Plot of Errors',
     # Fit data export folder
-    'Folder_Path' : 'C:/Users/someuser/folder_with_data',
+    'Folder_Path' : 'C:\\Users\LMEYER\Documents\Practice FTIR code\FittingOutput_2022_04_28_09_19_29',
     # Define error type. 'MSE', 'RMSE', or 'nRMSE'. 'nRMSE' is recommended
     # because it is normalized by the interquartile range allowing for comparison
     # among fits.

@@ -8,8 +8,8 @@ email: jpalmer1028@gmail.com
 ################################ USER INPUTS #################################
 ##############################################################################
 
-args = {# Fitting results output folder
-        'folder' : 'C:/Users/someuser/folder_with_data',
+args = {# Fitting results output folder, do not need curves folder just whole fitting results folder
+        'folder' : 'C:\\Users\LMEYER\Documents\Practice FTIR code\FittingOutput_2022_04_28_09_19_29',
         # Any "run number" within the fit output. Integer.
         'start' : 1,
         # An integer or 'all'. All will plot all spectra from the fit
