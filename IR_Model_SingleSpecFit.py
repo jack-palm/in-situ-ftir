@@ -2,6 +2,8 @@
 """
 author: Jack Palmer
 email: jpalmer1028@gmail.com
+new updates by: Lydia Meyer
+email: lydiaemeyer@gmail.com
 """
 
 import pandas as pd
@@ -16,19 +18,19 @@ from scipy import stats
 ##############################################################################
 
 # Define your intial parameters here.  
-initial_vals = {'filepath':'C:/Users/someuser/folder_with_data/datafile.txt',
+initial_vals = {'filepath':'C:\\Users\LMEYER\Desktop\LNO_LiClO4inPC_JH17_0_Abs_sub.txt',
                 'Plot_Title' : 'Generic Title',
                 'lower_bound' : 400, # Lowest wavenumber of fitting domain
                 'upper_bound' : 800, # Highest wavenumber of fitting domain
                 'electrode_peaks' : [440, 460, 560], # Wavenumbers of components
-                'electrolyte_peaks' : [500, 700, 720], # Wavenumbers of components
+                'electrolyte_peaks' : [500, 680, 760], # Wavenumbers of components
                 'tolerance' : 10.0, # Amount allowed to deviate from peaks defined above 
                 'first_vals' : pd.DataFrame(np.array([[1,440,17], 
                                                     [1,460,14], 
                                                     [1,500,10],
-                                                    [1,560,7],
-                                                    [1,700,4],
-                                                    [1,720,4]]),
+                                                    [1,560,10],
+                                                    [1,680,30],
+                                                    [1,760,50]]),
                                            columns=['amplitude', 'center', 'sigma'])
                 # 'first_vals' is the model's first guess at parameters
 }
@@ -281,7 +283,7 @@ def single_fit():
     # fit the desired data and return the best fit parameter values
     best_vals, component_names = get_fit_parameters(x_fit, y_fit, initial_vals['x_peaks'], initial_vals['first_vals'])
     # plot the fitting result and return the curves, areas, and amplitudes
-    curves, amplitudes, centers, areas, sigmas, maxima = plot_components(x_fit, y_fit, best_vals, initial_vals['x_peaks'], component_names)
+    curves, amplitudes, centers, areas, sigmas, maxima, errors = plot_components(x_fit, y_fit, best_vals, initial_vals['x_peaks'], component_names)
     
     return best_vals, curves, amplitudes, centers, areas, sigmas, maxima, errors
    

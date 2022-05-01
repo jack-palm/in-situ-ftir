@@ -2,6 +2,8 @@
 """
 author: Jack Palmer
 email: jpalmer1028@gmail.com
+updates by: Lydia Meyer
+email: lydiaemeyer@gmail.com
 """
 
 import pandas as pd
@@ -15,7 +17,7 @@ from scipy.spatial import ConvexHull
 
 args = {
     # Path raw data to be fit
-    'raw_file' : 'C:/Users/someuser/folder_with_data/data.txt',
+    'raw_file' : 'C:\\Users\LMEYER\Desktop\LNO_LiClO4inPC_JH17_0_Abs_sub.txt',
     # Path to another spectrum to add to the plot if desired
     'ref_file' : 'C:/Users/someuser/folder_with_data/data_for_reference.txt',
     # Do you want to plot the ref_file? Boolean

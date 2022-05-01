@@ -12,9 +12,9 @@ args = {
     # Title for the map
     'Plot_Title' : 'Test Map',
     # Fit data export folder
-    'Folder_Path' : 'C:/Users/someuser/folder_with_data',
+    'Folder_Path' : 'C:\\Users\LMEYER\Documents\Practice FTIR code\FittingOutput_2022_04_28_09_19_29',
     # Which components to plot. Must match column names in 'curves'
-    'Components' : [623] #503, 515, 544, 623, 567, 580, 591
+    'Components' : [500] #503, 515, 544, 623, 567, 580, 591
 }
 
 ##############################################################################

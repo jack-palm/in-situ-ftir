@@ -9,7 +9,7 @@ email: jpalmer1028@gmail.com
 ##############################################################################
 
 args = {# The path of the folder containing the desired fitting output
-        'folder' : 'C:/Users/someuser/folder_with_data',
+        'folder' : 'C:\\Users\LMEYER\Documents\Practice FTIR code\FittingOutput_2022_04_28_09_19_29',
         # A list of the wavenumbers of components you want to plot
         'components' : [500] #500, 510, 540, 620, 560, 580, 590
 }
